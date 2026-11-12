@@ -1,0 +1,12 @@
+# Maven outputs
+target/
+
+# IDE metadata
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+
+# Local logs and uploaded content
+*.log

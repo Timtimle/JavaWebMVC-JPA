@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "TestJpaConnection",
+            "request": "launch",
+            "mainClass": "vn.edu.hcmute.config.TestJpaConnection",
+            "vmArgs": "-Djava.library.path=E:\\App\\Tool\\sqljdbc-auth"
+        }
+    ]
+}
