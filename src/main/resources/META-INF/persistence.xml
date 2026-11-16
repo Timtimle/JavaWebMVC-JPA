@@ -8,6 +8,8 @@
         <class>vn.edu.hcmute.model.Category</class>
         <class>vn.edu.hcmute.model.User</class>
         <class>vn.edu.hcmute.model.RememberToken</class>
+        <class>vn.edu.hcmute.model.EmailOtp</class>
+        <class>vn.edu.hcmute.model.Video</class>
         <properties>
             <!-- Preserve the original JDBC URL and Windows authentication. -->
             <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />

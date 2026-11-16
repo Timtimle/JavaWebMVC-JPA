@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import jakarta.mail.MessagingException;
+import vn.edu.hcmute.service.impl.OtpService;
 
 @WebServlet("/register")
 public class RegisterController extends HttpServlet {
@@ -19,6 +21,7 @@ public class RegisterController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private final UserService userService = new UserServiceImpl();
+    private final OtpService otpService = new OtpService();
 
     private static final String REGISTER_VIEW =
             "/WEB-INF/views/register.jsp";
@@ -126,10 +129,14 @@ public class RegisterController extends HttpServlet {
 
             if (success) {
 
-                // Redirect to the login page
-                resp.sendRedirect(
-                    req.getContextPath() + "/login?registered=1"
-                );
+                try {
+                    otpService.send(email, OtpService.ACTIVATE);
+                } catch (MessagingException | IllegalStateException ex) {
+                    log("Activation OTP email was not sent", ex);
+                    // The account is inactive and can request a new OTP later.
+                }
+                resp.sendRedirect(req.getContextPath() + "/activate?email=" +
+                    java.net.URLEncoder.encode(email, java.nio.charset.StandardCharsets.UTF_8));
 
             } else {
 

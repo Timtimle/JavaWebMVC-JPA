@@ -1,0 +1,10 @@
+@echo off
+REM Copy these examples into your private Tomcat bin\setenv.bat.
+REM Replace the values locally. Never commit your real credentials.
+set "JWM_SMTP_HOST=smtp.gmail.com"
+set "JWM_SMTP_PORT=587"
+set "JWM_SMTP_USER=your-email@gmail.com"
+set "JWM_SMTP_FROM=your-email@gmail.com"
+set "JWM_SMTP_PASSWORD=your-application-password"
+set "JWM_OTP_SECRET=replace-with-a-long-random-secret"
+set "JWM_VIDEO_DIR=E:\App\Tool\javawebmvc-videos"

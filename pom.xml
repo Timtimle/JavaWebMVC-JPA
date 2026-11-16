@@ -39,7 +39,7 @@
             <artifactId>mssql-jdbc</artifactId>
             <version>12.10.2.jre11</version>
         </dependency>
-        <!-- Hibernate and JPA configuration. -->
+        <!-- Hibernate and JPA are based on the instructor's JPA configuration. -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
@@ -59,6 +59,11 @@
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.5</version>
         </dependency>
     </dependencies>
     <build>

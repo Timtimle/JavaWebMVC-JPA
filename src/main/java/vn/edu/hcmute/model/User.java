@@ -8,6 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
+import java.util.List;
 
 @Entity
 @Table(name = "Users")
@@ -43,6 +45,16 @@ public class User implements Serializable {
 
     @Column(name = "createdDate", insertable = false, updatable = false)
     private Timestamp createdDate;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Video> videos;
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+    public List<Video> getVideos() { return videos; }
 
     public User() {
     }

@@ -132,7 +132,7 @@ public class LoginController extends HttpServlet {
             if (user == null) {
                 req.setAttribute("rememberedUsername", username);
                 showError(req, resp,
-                    "Invalid username or password.");
+                    "Invalid credentials or account not activated. Check your email OTP.");
                 return;
             }
 

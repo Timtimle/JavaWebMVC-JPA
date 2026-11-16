@@ -1,12 +1,12 @@
-# Maven outputs
 target/
-
-# IDE metadata
-.classpath
-.project
-.settings/
-.idea/
-*.iml
-
-# Local logs and uploaded content
+*.class
 *.log
+.vscode/
+.idea/
+setenv.bat
+.env
+*.war
+
+target/
+setenv.bat
+.env

@@ -76,6 +76,18 @@
         .error { background: #fee2e2; color: #991b1b; }
         .success { background: #dcfce7; color: #166534; }
 
+        .forgot-button {
+            display: block;
+            margin-top: 12px;
+            padding: 11px 12px;
+            border: 1px solid #2563eb;
+            border-radius: 6px;
+            color: #2563eb;
+            text-align: center;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .forgot-button:hover { background: #eff6ff; }
         .footer { text-align: center; margin-top: 20px; }
         a { color: #2563eb; text-decoration: none; }
     </style>
@@ -97,6 +109,8 @@
         </div>
     </c:if>
 
+    <c:if test="${param.activated eq '1'}"><div class="alert success">Account activated successfully.</div></c:if>
+    <c:if test="${param.reset eq '1'}"><div class="alert success">Password reset successfully.</div></c:if>
     <form action="${pageContext.request.contextPath}/login"
           method="post">
 
@@ -128,7 +142,10 @@
         <button type="submit">Login</button>
     </form>
 
+    <a class="forgot-button" href="${pageContext.request.contextPath}/forgot-password">Forgot Password?</a>
+
     <div class="footer">
+        <a href="${pageContext.request.contextPath}/activate">Activate account</a><br>
         Don't have an account?
         <a href="${pageContext.request.contextPath}/register">
             Register

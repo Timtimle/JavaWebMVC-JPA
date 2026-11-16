@@ -109,6 +109,9 @@
     </div>
 
     
+    <a href="${pageContext.request.contextPath}/home" style="display:block;margin:12px 0;">Latest Videos</a>
+    <a href="${pageContext.request.contextPath}/video" style="display:block;margin:12px 0;">My Videos</a>
+
     <!-- Navigate to category management -->
     <a href="${pageContext.request.contextPath}/category/list"
     style="

@@ -100,6 +100,7 @@ public class RememberMeServiceImpl implements RememberMeService {
 
         User user = userDAO.getByUsername(username);
 
+        if (user != null && !user.isActive()) return null;
         if (user != null) {
             // Remove the password hash from the session user
             user.setPassword(null);

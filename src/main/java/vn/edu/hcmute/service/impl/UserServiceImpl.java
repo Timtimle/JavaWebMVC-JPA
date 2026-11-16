@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
         // Verify the password against the stored BCrypt hash
         try {
-            if (BCrypt.checkpw(password, user.getPassword())) {
+            if (user.isActive() && BCrypt.checkpw(password, user.getPassword())) {
                 // Do not expose the password hash in the session
                 user.setPassword(null);
                 return user;
@@ -77,6 +77,7 @@ public class UserServiceImpl implements UserService {
         user.setPhone(phone == null ? "" : phone.trim());
         user.setAvatar(null);
         user.setRoleId(3);
+        user.setActive(false);
 
         // Save the user to the database
         return userDAO.insert(user);
