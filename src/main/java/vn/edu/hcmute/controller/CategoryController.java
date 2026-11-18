@@ -337,7 +337,7 @@ public class CategoryController extends HttpServlet {
         );
     }
 
-    // Check authentication and category management permissions
+    // Require login for category management
     private boolean isAuthenticated(
             HttpServletRequest req,
             HttpServletResponse resp)
@@ -350,17 +350,6 @@ public class CategoryController extends HttpServlet {
             !(session.getAttribute("account") instanceof User)) {
 
             resp.sendRedirect(req.getContextPath() + "/login");
-            return false;
-        }
-
-        User user = (User) session.getAttribute("account");
-
-        // Only Admin (1) and Manager (2) can manage categories
-        if (user.getRoleId() != 1 && user.getRoleId() != 2) {
-            resp.sendError(
-                HttpServletResponse.SC_FORBIDDEN,
-                "You do not have permission to manage categories."
-            );
             return false;
         }
 

@@ -110,7 +110,15 @@
 
     
     <a href="${pageContext.request.contextPath}/home" style="display:block;margin:12px 0;">Latest Videos</a>
-    <a href="${pageContext.request.contextPath}/video" style="display:block;margin:12px 0;">My Videos</a>
+    <a href="${pageContext.request.contextPath}/video" style="
+        display: block;
+        padding: 12px;
+        margin-bottom: 12px;
+        background: #2563eb;
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+    ">Manage Videos</a>
 
     <!-- Navigate to category management -->
     <a href="${pageContext.request.contextPath}/category/list"
