@@ -42,7 +42,6 @@ public class WaitingController extends HttpServlet {
         req.setAttribute("user", user);
 
         // Display the temporary welcome page
-        req.getRequestDispatcher("/WEB-INF/views/waiting.jsp")
-           .forward(req, resp);
+        vn.edu.hcmute.util.JspView.render(req, resp, "/WEB-INF/views/waiting.jsp");
     }
 }

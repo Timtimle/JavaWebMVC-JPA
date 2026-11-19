@@ -1,115 +1,216 @@
 package vn.edu.hcmute.controller;
 
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.*;
-import jakarta.servlet.http.*;
-import vn.edu.hcmute.model.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 import vn.edu.hcmute.dao.VideoDAO;
+import vn.edu.hcmute.util.FormValidation;
+import vn.edu.hcmute.model.User;
+import vn.edu.hcmute.model.Video;
 import vn.edu.hcmute.service.impl.VideoStorage;
-import java.io.*;
 
-@WebServlet(urlPatterns={"/video","/video/new","/video/edit","/video/delete","/video/watch"})
-@MultipartConfig(fileSizeThreshold=1024*1024,maxFileSize=100L*1024*1024,maxRequestSize=105L*1024*1024)
+import java.io.IOException;
+
+@WebServlet(urlPatterns = {"/video", "/video/new", "/video/edit", "/video/delete", "/video/watch"})
+@MultipartConfig(fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 100L * 1024 * 1024,
+        maxRequestSize = 105L * 1024 * 1024)
 public class VideoController extends HttpServlet {
-    private final VideoDAO dao=new VideoDAO();
-    private final VideoStorage storage=new VideoStorage();
+    private static final int PAGE_SIZE = 6;
+    private static final String FORM = "/WEB-INF/views/video/form.jsp";
 
-    private User account(HttpServletRequest req) {
-        HttpSession s=req.getSession(false);
-        return s!=null && s.getAttribute("account") instanceof User u ? u : null;
+    private final VideoDAO dao = new VideoDAO();
+    private final VideoStorage storage = new VideoStorage();
+
+    private User account(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        return session != null && session.getAttribute("account") instanceof User user ? user : null;
     }
-    private long id(HttpServletRequest req) {
-        try {return Long.parseLong(req.getParameter("id"));}catch(Exception ex){return -1;}
-    }
-    private int page(HttpServletRequest req) {
-        try {return Math.max(1,Math.min(100000,Integer.parseInt(req.getParameter("page"))));}
-        catch(Exception ex){return 1;}
-    }
-    @Override protected void doGet(HttpServletRequest req,HttpServletResponse resp)
-            throws ServletException,IOException {
-        String path=req.getServletPath();
-        User user=account(req);
-        if("/video/watch".equals(path)) {
-            Video video=dao.find(id(req));
-            if(video==null){resp.sendError(404);return;}
-            dao.incrementViews(video.getId());
-            req.setAttribute("video",video);
-            req.getRequestDispatcher("/WEB-INF/views/video/watch.jsp").forward(req,resp);return;
-        }
-        if(user==null){resp.sendRedirect(req.getContextPath()+"/login");return;}
-        if("/video".equals(path)) {
-            int current=page(req);
-            long total=dao.countByOwner(user.getId());
-            long pages=Math.max(1,(total+5)/6);
-            current=(int)Math.min(current,pages);
-            req.setAttribute("videos",dao.byOwner(user.getId(),current));
-            req.setAttribute("page",current);req.setAttribute("pages",pages);
-            req.getRequestDispatcher("/WEB-INF/views/video/list.jsp").forward(req,resp);return;
-        }
-        if("/video/new".equals(path)) {
-            req.getRequestDispatcher("/WEB-INF/views/video/form.jsp").forward(req,resp);return;
-        }
-        if("/video/edit".equals(path)) {
-            Video video=dao.find(id(req));
-            if(video==null||video.getOwner().getId()!=user.getId()){resp.sendError(404);return;}
-            req.setAttribute("video",video);
-            req.getRequestDispatcher("/WEB-INF/views/video/form.jsp").forward(req,resp);return;
-        }
-        resp.sendError(405);
-    }
-    @Override protected void doPost(HttpServletRequest req,HttpServletResponse resp)
-            throws ServletException,IOException {
-        User user=account(req);
-        if(user==null){resp.sendRedirect(req.getContextPath()+"/login");return;}
-        req.setCharacterEncoding("UTF-8");
-        String path=req.getServletPath();
-        long id=id(req);
-        if("/video/delete".equals(path)) {
-            Video prior=dao.find(id);
-            if(prior==null||prior.getOwner().getId()!=user.getId()) {resp.sendError(404);return;}
-            if(dao.delete(id,user.getId()))storage.delete(prior.getFileName());
-            resp.sendRedirect(req.getContextPath()+"/video");return;
-        }
-        boolean edit="/video/edit".equals(path);
-        if(!edit&&!"/video/new".equals(path)){resp.sendError(405);return;}
-        Video prior=edit?dao.find(id):null;
-        if(edit&&(prior==null||prior.getOwner().getId()!=user.getId())){
-            resp.sendError(404);return;
-        }
-        String title=req.getParameter("title");
-        String description=req.getParameter("description");
-        title=title==null?"":title.trim();
-        description=description==null?"":description.trim();
-        if(title.isEmpty()||title.length()>255||description.length()>2000){
-            showForm(req,resp,prior,"Title is required (max 255 characters); description max 2000.");return;
-        }
-        Part part=req.getPart("videoFile");
-        String saved=null;
+
+    private long videoId(HttpServletRequest request) {
         try {
-            if(part!=null&&part.getSize()>0)saved=storage.save(part);
-            if(!edit&&saved==null) {
-                showForm(req,resp,null,"Please select a video file.");return;
-            }
-            if(edit) {
-                if(!dao.update(id,user.getId(),title,description,saved)){
-                    resp.sendError(404);return;
-                }
-                if(saved!=null)storage.delete(prior.getFileName());
-            } else {
-                Video video=new Video();
-                video.setTitle(title);video.setDescription(description);video.setFileName(saved);
-                dao.insert(video,user.getId());
-            }
-            resp.sendRedirect(req.getContextPath()+"/video");
-        } catch(IOException|RuntimeException ex) {
-            if(saved!=null)storage.delete(saved);
-            log("Video save failed",ex);
-            showForm(req,resp,prior,"Could not save video: " + ex.getMessage());
+            return Long.parseLong(request.getParameter("id"));
+        } catch (NumberFormatException ex) {
+            return -1;
         }
     }
-    private void showForm(HttpServletRequest req,HttpServletResponse resp,Video video,String error)
-            throws ServletException,IOException {
-        req.setAttribute("video",video);req.setAttribute("alert",error);
-        req.getRequestDispatcher("/WEB-INF/views/video/form.jsp").forward(req,resp);
+
+    private int page(HttpServletRequest request) {
+        try {
+            return Math.max(1, Math.min(100000, Integer.parseInt(request.getParameter("page"))));
+        } catch (NumberFormatException ex) {
+            return 1;
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String path = request.getServletPath();
+
+        // Anyone can watch videos; only authenticated users can manage their own uploads.
+        if ("/video/watch".equals(path)) {
+            Video video = dao.find(videoId(request));
+            if (video == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            dao.incrementViews(video.getId());
+            request.setAttribute("video", video);
+            vn.edu.hcmute.util.JspView.render(request, response, "/WEB-INF/views/video/watch.jsp");
+            return;
+        }
+
+        User user = account(request);
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        response.setHeader("Cache-Control", "no-store");
+        switch (path) {
+            case "/video" -> {
+                long count = dao.countByOwner(user.getId());
+                long pages = Math.max(1, (count + PAGE_SIZE - 1) / PAGE_SIZE);
+                int current = (int) Math.min(page(request), pages);
+                request.setAttribute("videos", dao.byOwner(user.getId(), current));
+                request.setAttribute("page", current);
+                request.setAttribute("pages", pages);
+                request.setAttribute("total", count);
+                vn.edu.hcmute.util.JspView.render(request, response, "/WEB-INF/views/video/list.jsp");
+            }
+            case "/video/new" -> {
+                prepareForm(request, null);
+                vn.edu.hcmute.util.JspView.render(request, response, FORM);
+            }
+            case "/video/edit" -> {
+                Video video = dao.find(videoId(request));
+                if (!ownedBy(video, user)) {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+                prepareForm(request, video);
+                vn.edu.hcmute.util.JspView.render(request, response, FORM);
+            }
+            default -> response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        User user = account(request);
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        request.setCharacterEncoding("UTF-8");
+        String path = request.getServletPath();
+        long id = videoId(request);
+
+        if ("/video/delete".equals(path)) {
+            Video existing = dao.find(id);
+            if (!ownedBy(existing, user)) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            if (dao.delete(id, user.getId())) {
+                storage.delete(existing.getFileName());
+            }
+            response.sendRedirect(request.getContextPath() + "/video?deleted=1");
+            return;
+        }
+
+        boolean editing = "/video/edit".equals(path);
+        if (!editing && !"/video/new".equals(path)) {
+            response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            return;
+        }
+        Video existing = editing ? dao.find(id) : null;
+        if (editing && !ownedBy(existing, user)) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        String uploaded = null;
+        try {
+            String title = trim(request.getParameter("title"));
+            String description = trim(request.getParameter("description"));
+            request.setAttribute("formTitle", title);
+            request.setAttribute("formDescription", description);
+            if (!FormValidation.videoTitle(title) || description.length() > 2000) {
+                showForm(request, response, existing, "Title is required (max 255 characters); description max 2000.");
+                return;
+            }
+            Part file = request.getPart("videoFile");
+            if (file != null && file.getSize() > 0) {
+                uploaded = storage.save(file);
+            }
+            if (!editing && uploaded == null) {
+                showForm(request, response, null, "Choose a video file to upload.");
+                return;
+            }
+
+            if (editing) {
+                if (!dao.update(id, user.getId(), title, description, uploaded)) {
+                    if (uploaded != null) storage.delete(uploaded);
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+                // Remove the old file only after the database transaction succeeds.
+                if (uploaded != null) storage.delete(existing.getFileName());
+            } else {
+                Video video = new Video();
+                video.setTitle(title);
+                video.setDescription(description);
+                video.setFileName(uploaded);
+                dao.insert(video, user.getId());
+            }
+            response.sendRedirect(request.getContextPath() + "/video?saved=1");
+        } catch (IllegalStateException ex) {
+            if (uploaded != null) storage.delete(uploaded);
+            log("Video upload rejected by multipart limits", ex);
+            response.sendError(413, "Video must be 100 MB or smaller.");
+        } catch (IOException ex) {
+            if (uploaded != null) storage.delete(uploaded);
+            log("Video upload failed", ex);
+            showForm(request, response, existing, ex.getMessage());
+        } catch (ServletException | RuntimeException ex) {
+            if (uploaded != null) storage.delete(uploaded);
+            log("Video save failed", ex);
+            showForm(request, response, existing, "Unable to save video. Check the file and try again.");
+        }
+    }
+
+    private static boolean ownedBy(Video video, User user) {
+        return video != null && video.getOwner().getId() == user.getId();
+    }
+
+    private static String trim(String value) {
+        return value == null ? "" : value.trim();
+    }
+
+    private void prepareForm(HttpServletRequest request, Video video) {
+        request.setAttribute("video", video);
+        request.setAttribute("formTitle", video == null ? "" : video.getTitle());
+        request.setAttribute("formDescription", video == null ? "" : video.getDescription());
+    }
+
+    private void showForm(HttpServletRequest request, HttpServletResponse response,
+                          Video video, String error) throws ServletException, IOException {
+        request.setAttribute("video", video);
+        request.setAttribute("alert", error);
+        if (request.getAttribute("formTitle") == null) {
+            request.setAttribute("formTitle", video == null ? "" : video.getTitle());
+        }
+        if (request.getAttribute("formDescription") == null) {
+            request.setAttribute("formDescription", video == null ? "" : video.getDescription());
+        }
+        vn.edu.hcmute.util.JspView.render(request, response, FORM);
     }
 }

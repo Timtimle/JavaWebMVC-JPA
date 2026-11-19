@@ -12,6 +12,6 @@ public class HomeController extends HttpServlet {
     @Override protected void doGet(HttpServletRequest req,HttpServletResponse resp)
             throws ServletException, IOException {
         req.setAttribute("videos",videos.latestTen());
-        req.getRequestDispatcher("/WEB-INF/views/video/home.jsp").forward(req,resp);
+        vn.edu.hcmute.util.JspView.render(req, resp, "/WEB-INF/views/video/home.jsp");
     }
 }

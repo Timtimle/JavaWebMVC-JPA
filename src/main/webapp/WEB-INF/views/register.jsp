@@ -1,146 +1,37 @@
-<%@ page contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - JavaWebMVC</title>
-
-    <style>
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #f0f2f5;
-            font-family: Arial, sans-serif;
-        }
-
-        .container {
-            background: white;
-            width: 420px;
-            max-width: 92%;
-            padding: 35px;
-            border-radius: 12px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
-        }
-
-        h2 { text-align: center; margin-bottom: 25px; }
-
-        label {
-            display: block;
-            margin: 12px 0 6px;
-            font-weight: bold;
-        }
-
-        input {
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 20px;
-            background: #16a34a;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover { background: #15803d; }
-
-        .alert {
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .footer { text-align: center; margin-top: 20px; }
-        a { color: #2563eb; text-decoration: none; }
-    </style>
-</head>
+<head><meta charset="UTF-8"><title>Register</title></head>
 <body>
-
-<div class="container">
-    <h2>Create Account</h2>
-
-    <c:if test="${not empty alert}">
-        <div class="alert">
-            <c:out value="${alert}" />
-        </div>
-    </c:if>
-
-    <form action="${pageContext.request.contextPath}/register"
-          method="post">
-
-        <label for="username">Username *</label>
-        <input type="text"
-               id="username"
-               name="username"
-               value="<c:out value='${username}'/>"
-               placeholder="Enter username"
-               maxlength="100"
-               autocomplete="username"
-               required>
-
-        <label for="email">Email *</label>
-        <input type="email"
-               id="email"
-               name="email"
-               value="<c:out value='${email}'/>"
-               placeholder="Enter email address"
-               maxlength="255"
-               autocomplete="email"
-               required>
-
-        <label for="fullname">Full Name</label>
-        <input type="text"
-               id="fullname"
-               name="fullname"
-               value="<c:out value='${fullname}'/>"
-               placeholder="Enter full name"
-               maxlength="255">
-
-        <label for="phone">Phone</label>
-        <input type="tel"
-               id="phone"
-               name="phone"
-               value="<c:out value='${phone}'/>"
-               placeholder="Enter phone number"
-               maxlength="20">
-
-        <label for="password">Password *</label>
-        <input type="password"
-               id="password"
-               name="password"
-               placeholder="At least 8 characters"
-               minlength="8"
-               autocomplete="new-password"
-               required>
-
-        <button type="submit">Register</button>
-    </form>
-
-    <div class="footer">
-        Already have an account?
-        <a href="${pageContext.request.contextPath}/login">
-            Login
-        </a>
-    </div>
-</div>
-
-</body>
-</html>
+<section class="auth-card page-card">
+        <h1 class="h3 fw-bold mb-2">Create account</h1>
+        <p class="text-secondary mb-4">Verify your email to activate your account.</p>
+        <c:if test="${not empty alert}"><div class="alert alert-danger" role="alert"><c:out value="${alert}"/></div></c:if>
+<c:if test="${not empty info}"><div class="alert alert-success" role="status"><c:out value="${info}"/></div></c:if>
+        <form action="${pageContext.request.contextPath}/register" method="post" data-validate novalidate>
+            <div class="mb-3"><label class="form-label" for="username">Username</label>
+                <input class="form-control" id="username" type="text" name="username" value="<c:out value='${username}'/>"
+                       minlength="3" maxlength="100" pattern="[A-Za-z0-9_.-]{3,100}" autocomplete="username" required>
+                <div class="invalid-feedback">Use 3-100 letters, numbers, dots, dashes or underscores.</div>
+            </div>
+            <div class="mb-3"><label class="form-label" for="email">Email</label>
+                <input class="form-control" id="email" type="email" name="email" maxlength="255" value="<c:out value='${email}'/>" required>
+                <div class="invalid-feedback">Enter a valid email.</div>
+            </div>
+            <div class="mb-3"><label class="form-label" for="fullname">Full name</label>
+                <input class="form-control" id="fullname" type="text" name="fullname" maxlength="255" value="<c:out value='${fullname}'/>">
+            </div>
+            <div class="mb-3"><label class="form-label" for="phone">Phone</label>
+                <input class="form-control" id="phone" type="tel" name="phone" maxlength="20" pattern="[+0-9 ()-]{8,20}" value="<c:out value='${phone}'/>">
+                <div class="invalid-feedback">Enter a valid phone number or leave blank.</div>
+            </div>
+            <div class="mb-3"><label class="form-label" for="password">Password</label>
+                <input class="form-control" id="password" type="password" name="password" minlength="8" maxlength="128" required autocomplete="new-password">
+                <div class="invalid-feedback">Use 8-128 characters.</div>
+            </div>
+            <button class="btn btn-primary w-100" type="submit">Register</button>
+        </form>
+        <p class="small mt-3 mb-0">Already registered? <a href="${pageContext.request.contextPath}/login">Login</a></p>
+    </section>
+</body></html>

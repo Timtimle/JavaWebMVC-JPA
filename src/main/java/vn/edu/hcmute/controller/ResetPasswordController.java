@@ -4,6 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import vn.edu.hcmute.service.impl.OtpService;
+import vn.edu.hcmute.util.FormValidation;
 import java.io.IOException;
 
 @WebServlet("/reset-password")
@@ -11,7 +12,7 @@ public class ResetPasswordController extends HttpServlet {
     private final OtpService otp = new OtpService();
     @Override protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        req.getRequestDispatcher("/WEB-INF/views/reset-password.jsp").forward(req, resp);
+        vn.edu.hcmute.util.JspView.render(req, resp, "/WEB-INF/views/reset-password.jsp");
     }
     @Override protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -19,7 +20,7 @@ public class ResetPasswordController extends HttpServlet {
         String email = req.getParameter("email");
         String password = req.getParameter("password");
         String confirm = req.getParameter("confirm");
-        if (password == null || password.length() < 8 || !password.equals(confirm)) {
+        if (!FormValidation.password(password) || !password.equals(confirm)) {
             req.setAttribute("alert", "Passwords must match and contain at least 8 characters."); doGet(req,resp); return;
         }
         if (otp.verify(email, OtpService.RESET, req.getParameter("code"), password)) {

@@ -12,7 +12,7 @@ public class ActivationController extends HttpServlet {
     private final OtpService otp = new OtpService();
     @Override protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        req.getRequestDispatcher("/WEB-INF/views/activate.jsp").forward(req, resp);
+        vn.edu.hcmute.util.JspView.render(req, resp, "/WEB-INF/views/activate.jsp");
     }
     @Override protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

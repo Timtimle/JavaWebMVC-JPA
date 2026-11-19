@@ -1,6 +1,7 @@
 package vn.edu.hcmute.controller;
 
 import vn.edu.hcmute.service.UserService;
+import vn.edu.hcmute.util.FormValidation;
 import vn.edu.hcmute.service.impl.UserServiceImpl;
 
 import jakarta.servlet.ServletException;
@@ -42,7 +43,7 @@ public class RegisterController extends HttpServlet {
             return;
         }
 
-        req.getRequestDispatcher(REGISTER_VIEW).forward(req, resp);
+        vn.edu.hcmute.util.JspView.render(req, resp, REGISTER_VIEW);
     }
 
     // Process the registration form
@@ -72,12 +73,17 @@ public class RegisterController extends HttpServlet {
         req.setAttribute("fullname", fullName);
         req.setAttribute("phone", phone);
 
-        // Validate required fields
-        if (username.isEmpty() ||
-            password == null || password.isEmpty() ||
-            email.isEmpty()) {
-
-            showError(req, resp, "Please fill in all required fields.");
+        if (!FormValidation.username(username)) {
+            showError(req, resp, "Username must be 3-100 characters (letters, numbers, _ . -).");
+            return;
+        }
+        if (!FormValidation.password(password)) {
+            showError(req, resp, "Password must be 8-128 characters.");
+            return;
+        }
+        if (!FormValidation.email(email) || !FormValidation.fullName(fullName) ||
+                !FormValidation.phone(phone)) {
+            showError(req, resp, "Please check email, name and phone number.");
             return;
         }
 
@@ -161,6 +167,6 @@ public class RegisterController extends HttpServlet {
             throws ServletException, IOException {
 
         req.setAttribute("alert", message);
-        req.getRequestDispatcher(REGISTER_VIEW).forward(req, resp);
+        vn.edu.hcmute.util.JspView.render(req, resp, REGISTER_VIEW);
     }
 }

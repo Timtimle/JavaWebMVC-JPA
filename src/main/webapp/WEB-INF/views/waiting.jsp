@@ -1,145 +1,23 @@
-<%@ page contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Dashboard - JavaWebMVC</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #f0f2f5;
-            font-family: Arial, sans-serif;
-        }
-
-        .container {
-            width: 450px;
-            max-width: 92%;
-            padding: 35px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-
-        h1 {
-            color: #2563eb;
-        }
-
-        .info {
-            margin: 25px 0;
-            padding: 15px;
-            background: #f8fafc;
-            border-radius: 8px;
-            text-align: left;
-        }
-
-        .info p {
-            margin: 12px 0;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #dc2626;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background: #b91c1c;
-        }
-    </style>
-</head>
-
+<head><meta charset="UTF-8"><title>Dashboard</title></head>
 <body>
-
-<div class="container">
-
-    <h1>Welcome!</h1>
-
-    <p>
-        Hello,
-        <strong>
-            <c:out value="${user.fullName}" />
-        </strong>
-    </p>
-
-    <p>You have successfully logged in.</p>
-
-    <div class="info">
-        <p>
-            <strong>Username:</strong>
-            <c:out value="${user.username}" />
-        </p>
-
-        <p>
-            <strong>Email:</strong>
-            <c:out value="${user.email}" />
-        </p>
-
-        <p>
-            <strong>Role:</strong>
-            <c:choose>
-                <c:when test="${user.roleId == 1}">
-                    Administrator
-                </c:when>
-                <c:otherwise>
-                    User
-                </c:otherwise>
-            </c:choose>
-        </p>
+<section class="page-card p-4 mx-auto" style="max-width:750px">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div><p class="text-secondary small mb-1">Dashboard</p><h1 class="h3 mb-0">Welcome, <c:out value="${user.fullName}"/></h1></div>
+        <a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/profile">Edit profile</a>
     </div>
-
-    
-    <a href="${pageContext.request.contextPath}/home" style="display:block;margin:12px 0;">Latest Videos</a>
-    <a href="${pageContext.request.contextPath}/video" style="
-        display: block;
-        padding: 12px;
-        margin-bottom: 12px;
-        background: #2563eb;
-        color: white;
-        border-radius: 6px;
-        text-decoration: none;
-    ">Manage Videos</a>
-
-    <!-- Navigate to category management -->
-    <a href="${pageContext.request.contextPath}/category/list"
-    style="
-        display: block;
-        padding: 12px;
-        margin-bottom: 12px;
-        background: #2563eb;
-        color: white;
-        border-radius: 6px;
-        text-decoration: none;
-    ">
-        Manage Categories
-    </a>
-
-    <form action="${pageContext.request.contextPath}/logout"
-          method="post">
-        <button type="submit">Logout</button>
-    </form>
-
-</div>
-
-</body>
-</html>
+    <div class="bg-light rounded-3 p-3 mb-4">
+        <p class="mb-2"><strong>Username:</strong> <c:out value="${user.username}"/></p>
+        <p class="mb-2"><strong>Email:</strong> <c:out value="${user.email}"/></p>
+        <p class="mb-0"><strong>Role:</strong> <c:choose><c:when test="${user.roleId == 1}">Administrator</c:when><c:otherwise>User</c:otherwise></c:choose></p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-primary" href="${pageContext.request.contextPath}/home">Latest videos</a>
+        <a class="btn btn-primary" href="${pageContext.request.contextPath}/video">Manage videos</a>
+        <a class="btn btn-outline-primary" href="${pageContext.request.contextPath}/category/list">Categories</a>
+    </div>
+</section>
+</body></html>

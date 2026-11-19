@@ -1,6 +1,7 @@
 package vn.edu.hcmute.controller;
 
 import vn.edu.hcmute.model.Category;
+import vn.edu.hcmute.util.FormValidation;
 import vn.edu.hcmute.service.CategoryService;
 import vn.edu.hcmute.service.impl.CategoryServiceImpl;
 
@@ -75,16 +76,12 @@ public class CategoryController extends HttpServlet {
                     req.setAttribute("cateList", categories);
                     req.setAttribute("keyword", keyword);
 
-                    req.getRequestDispatcher(
-                        VIEW_DIR + "list-category.jsp"
-                    ).forward(req, resp);
+                    vn.edu.hcmute.util.JspView.render(req, resp, VIEW_DIR + "list-category.jsp");
                 }
 
                 case "/add" -> {
                     // Display the category creation form
-                    req.getRequestDispatcher(
-                        VIEW_DIR + "add-category.jsp"
-                    ).forward(req, resp);
+                    vn.edu.hcmute.util.JspView.render(req, resp, VIEW_DIR + "add-category.jsp");
                 }
 
                 case "/edit" -> {
@@ -101,9 +98,7 @@ public class CategoryController extends HttpServlet {
 
                     req.setAttribute("category", category);
 
-                    req.getRequestDispatcher(
-                        VIEW_DIR + "edit-category.jsp"
-                    ).forward(req, resp);
+                    vn.edu.hcmute.util.JspView.render(req, resp, VIEW_DIR + "edit-category.jsp");
                 }
 
                 default -> resp.sendError(404);
@@ -163,9 +158,15 @@ public class CategoryController extends HttpServlet {
                              HttpServletResponse resp)
             throws SQLException, ServletException, IOException {
 
+        String name = req.getParameter("catename");
+        name = name == null ? "" : name.trim();
+        if (!FormValidation.category(name)) {
+            req.setAttribute("alert", "Category name is required (max 255 characters).");
+            vn.edu.hcmute.util.JspView.render(req, resp, VIEW_DIR + "add-category.jsp");
+            return;
+        }
         Category category = new Category();
-
-        category.setName(req.getParameter("catename"));
+        category.setName(name);
 
         // Save the uploaded image if one is provided
         String imageName = saveImage(req);
@@ -205,10 +206,17 @@ public class CategoryController extends HttpServlet {
             return;
         }
 
+        String name = req.getParameter("catename");
+        name = name == null ? "" : name.trim();
+        if (!FormValidation.category(name)) {
+            req.setAttribute("category", existing);
+            req.setAttribute("alert", "Category name is required (max 255 characters).");
+            vn.edu.hcmute.util.JspView.render(req, resp, VIEW_DIR + "edit-category.jsp");
+            return;
+        }
         Category category = new Category();
-
         category.setId(id);
-        category.setName(req.getParameter("catename"));
+        category.setName(name);
 
         // Preserve the existing image if no new image is uploaded
         String imageName = saveImage(req);

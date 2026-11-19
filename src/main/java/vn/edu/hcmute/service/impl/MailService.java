@@ -42,7 +42,8 @@ public class MailService {
         message.setFrom(new InternetAddress(System.getenv("JWM_SMTP_FROM")));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, true));
         message.setSubject("JavaWebMVC - " + ("ACTIVATE".equals(purpose) ?
-                "Account activation code" : "Password reset code"), "UTF-8");
+                "Account activation code" :
+                "CHANGE_EMAIL".equals(purpose) ? "Email change code" : "Password reset code"), "UTF-8");
         message.setText("Your verification code: " + code +
                 "\nThis code expires in 10 minutes. Do not share it.", "UTF-8");
         Transport.send(message);

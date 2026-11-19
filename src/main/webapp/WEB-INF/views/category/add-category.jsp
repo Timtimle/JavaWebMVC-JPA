@@ -1,69 +1,24 @@
-<%@ page contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8" %>
-
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Add Category - JavaWebMVC</title>
-
-    <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/assets/css/category.css">
-</head>
+<head><meta charset="UTF-8"><title>Add Category</title></head>
 <body>
-
-<div class="container">
-    <div class="card form-card">
-
-        <h2>Add New Category</h2>
-
-        <!-- Create a new category -->
-        <form action="${pageContext.request.contextPath}/category/add"
-              method="post"
-              enctype="multipart/form-data">
-
-            <div class="form-group">
-                <label for="catename">Category Name *</label>
-
-                <input type="text"
-                       id="catename"
-                       name="catename"
-                       maxlength="255"
-                       placeholder="Enter category name"
-                       required>
+<section class="form-card page-card">
+        <h1 class="h3 mb-3">Add category</h1>
+        <c:if test="${not empty alert}"><div class="alert alert-danger" role="alert"><c:out value="${alert}"/></div></c:if>
+<c:if test="${not empty info}"><div class="alert alert-success" role="status"><c:out value="${info}"/></div></c:if>
+        <form method="post" action="${pageContext.request.contextPath}/category/add" enctype="multipart/form-data" data-validate novalidate>
+            <div class="mb-3"><label class="form-label" for="catename">Category name</label>
+                <input class="form-control" id="catename" type="text" name="catename" maxlength="255" required>
+                <div class="invalid-feedback">Enter a category name (max 255).</div>
             </div>
-
-            <div class="form-group">
-                <label for="icon">Category Image</label>
-
-                <input type="file"
-                       id="icon"
-                       name="icon"
-                       accept="image/png,image/jpeg,image/gif">
-
-                <span class="note">
-                    JPG, PNG or GIF. Maximum 5 MB.
-                </span>
+            <div class="mb-4"><label class="form-label" for="icon">Image (optional)</label>
+                <input class="form-control" id="icon" type="file" name="icon" accept="image/jpeg,image/png,image/gif,.jpg,.png,.gif">
+                <div class="form-text">JPG, PNG or GIF · max 5 MB.</div>
             </div>
-
-            <div class="form-buttons">
-                <button class="btn btn-green"
-                        type="submit">
-                    Add Category
-                </button>
-
-                <a class="btn btn-gray"
-                   href="${pageContext.request.contextPath}/category/list">
-                    Cancel
-                </a>
-            </div>
+            <div class="d-flex gap-2"><button class="btn btn-primary" type="submit">Add category</button>
+                <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}/category/list">Cancel</a></div>
         </form>
-
-    </div>
-</div>
-
-</body>
-</html>
+    </section>
+</body></html>

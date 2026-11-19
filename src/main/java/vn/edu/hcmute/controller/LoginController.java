@@ -1,6 +1,7 @@
 package vn.edu.hcmute.controller;
 
 import vn.edu.hcmute.model.User;
+import vn.edu.hcmute.util.FormValidation;
 import vn.edu.hcmute.service.UserService;
 import vn.edu.hcmute.service.RememberMeService;
 import vn.edu.hcmute.service.impl.UserServiceImpl;
@@ -97,7 +98,7 @@ public class LoginController extends HttpServlet {
             }
         }
 
-        req.getRequestDispatcher(LOGIN_VIEW).forward(req, resp);
+        vn.edu.hcmute.util.JspView.render(req, resp, LOGIN_VIEW);
     }
 
     // Process the login form
@@ -124,6 +125,10 @@ public class LoginController extends HttpServlet {
         }
 
         username = username.trim();
+        if (username.length() > 100 || password.length() > 128) {
+            showError(req, resp, "Invalid username or password length.");
+            return;
+        }
 
         try {
             // Authenticate with username and password
@@ -250,6 +255,6 @@ public class LoginController extends HttpServlet {
             throws ServletException, IOException {
 
         req.setAttribute("alert", message);
-        req.getRequestDispatcher(LOGIN_VIEW).forward(req, resp);
+        vn.edu.hcmute.util.JspView.render(req, resp, LOGIN_VIEW);
     }
 }
